@@ -4,8 +4,11 @@
       "adapter": "js-debug",
       "breakpoints": {
         "exception": {
-          "all": "N",
-          "uncaught": "N"
+          "all": "",
+          "caught": "",
+          "uncaught": "",
+          "userUnhandled": "",
+          "raised": ""
         }
       },
       "configuration": {

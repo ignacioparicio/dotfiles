@@ -1,23 +1,23 @@
 {
-    "configurations": {
-        "Python": {
-            "adapter": "debugpy",
-            "breakpoints": {
-                "exception": {
-                    "all": "",
-                    "caught": "",
-                    "uncaught": "",
-                    "userUnhandled": "",
-                    "raised": ""
-                    }
-            },
-            "configuration": {
-                "name": "Python: current file",
-                "request": "launch",
-                "program": "${file}",
-                "stopOnEntry": false,
-                "console": "externalTerminal"
-            }
+  "configurations": {
+    "Python": {
+      "adapter": "debugpy",
+      "breakpoints": {
+        "exception": {
+          "all": "",
+          "caught": "",
+          "uncaught": "",
+          "userUnhandled": "",
+          "raised": ""
         }
+      },
+      "configuration": {
+        "name": "Python: current file",
+        "request": "launch",
+        "program": "${file}",
+        "stopOnEntry": false,
+        "console": "externalTerminal"
+      }
     }
+  }
 }
