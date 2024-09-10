@@ -1,3 +1,11 @@
+# Fetch all remote branches from origin to local tracking branches
 git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+
+# Automatically set up a remote tracking branch when pushing
+git config --global push.autoSetupRemote always
+
+# Automatically fetch submodules on git pull
 git config --global submodule.recurse true
+
+# Fetch submodules in parallel
 git config --global submodule.fetchJobs 16
