@@ -9,3 +9,6 @@ git config --global submodule.recurse true
 
 # Fetch submodules in parallel
 git config --global submodule.fetchJobs 16
+
+# Use vim as the default editor
+git config --global core.editor "vim"
