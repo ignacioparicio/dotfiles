@@ -7,7 +7,7 @@ This repo contains dotfiles to configure tmux and Neovim.
 - `sudo apt install tmux neovim build-essentials fzf python3.12-venv ripgrep` (consider if a different Python version is needed)
 - Install [Node](https://nodejs.org/en/download/package-manager)
 
-## Usage
+## Bootstrapping Neovim
 
 1. Consider wiping existing configuration:
 

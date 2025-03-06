@@ -1,4 +1,7 @@
 alias vim='nvim'
+# alias vim='NVIM_APPNAME="nvim-kickstart" nvim' # alternative with multiple configs
+# alias sudovim='sudo env NVIM_APPNAME="nvim-kickstart" nvim'
+
 
 alias dv="cd /home/ignacio/.local/share/docker/volumes"
 
