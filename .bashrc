@@ -12,3 +12,11 @@ alias zo='new_value=$(echo "$(gsettings get org.gnome.desktop.interface text-sca
 
 alias load-venv="source ~/.venv/bin/activate"
 load-venv
+
+alias psql-ctd='psql -h host -p 21699 -U pxl050 -d transactions'
+alias psql-ctd-ctd='psql -h host -p 21699 -U ctd -d transactions' # Temporarily update password in .profile
+
+# "hm" = headset mic: switch to HSP/HFP mode (lower audio quality, but enables mic), and set headset mic as default input
+alias hm='pactl set-card-profile bluez_card.78_2B_64_CE_B8_A6 headset-head-unit-msbc && pactl set-default-source bluez_input.78_2B_64_CE_B8_A6.0'
+# "ha" = headset audio: switch to A2DP mode (high audio quality, but mic disabled), and set headset as default output
+alias ha='pactl set-card-profile bluez_card.78_2B_64_CE_B8_A6 a2dp-sink'
