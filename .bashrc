@@ -1,8 +1,7 @@
-# Auto-start tmux in local terminal
-if [ -z "$TMUX" ]; then
+# Auto-start tmux in local terminal, but not in VSCode
+if [ -z "$TMUX" ] && [ "$TERM_PROGRAM" != "vscode" ]; then
   tmux attach || tmux new
 fi
-
 
 alias vim='nvim'
 # alias vim='NVIM_APPNAME="nvim-kickstart" nvim' # alternative with multiple configs
