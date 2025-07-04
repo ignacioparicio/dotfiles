@@ -45,3 +45,17 @@ alias ha='
   echo "Switched to headset audio (A2DP mode)"
 '
 
+# Customize default PS1 (shell prompt)
+parse_git_branch() {
+  git rev-parse --is-inside-work-tree &>/dev/null || return
+  branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+  maxlen=30
+  ellipsis="..."
+  if [[ ${#branch} -gt $maxlen ]]; then
+    cutlen=$(( maxlen - ${#ellipsis} ))
+    echo "${branch:0:$cutlen}${ellipsis}"
+  else
+    echo "$branch"
+  fi
+}
+PS1='\[\e[1;34m\]\w\[\e[0m\]$(branch=$(parse_git_branch); [[ -n "$branch" ]] && echo " \[\e[1;33m\][$branch]\[\e[0m\]")\$ '
