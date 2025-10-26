@@ -3,11 +3,14 @@ if [ -z "$TMUX" ] && [ "$TERM_PROGRAM" != "vscode" ]; then
   tmux attach || tmux new
 fi
 
-alias vim='nvim'
-# alias vim='NVIM_APPNAME="nvim-kickstart" nvim' # alternative with multiple configs
-# alias sudovim='sudo env NVIM_APPNAME="nvim-kickstart" nvim'
+# NVM (Node Version Manager) setup
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-alias dv="cd /home/ignacio/.local/share/docker/volumes"
+alias vim='nvim'
+alias concat='~/.local/bin/scripts/concat.sh'
+alias dv="cd /home/ignacio.paricio/.local/share/docker/volumes"
 
 # control text-scaling-factor for monitor hot-plugging, memo: z(zoom), zi (zoom in), zo (zoom out)
 alias z='echo "text-scaling-factor: $(gsettings get org.gnome.desktop.interface text-scaling-factor)"'
