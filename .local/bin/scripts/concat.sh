@@ -22,8 +22,9 @@
 set -euo pipefail
 
 find . -path '*/.*' -prune -o -type f -print0 | sort -z | while IFS= read -r -d '' f; do
-  if [ -e /dev/fd/1 ] && [ "$f" -ef /dev/fd/1 ]; then continue; fi
-  printf '# %s\n' "${f#./}"
+  abs="$PWD/${f#./}"
+  if [ -e /dev/fd/1 ] && [ "$abs" -ef /dev/fd/1 ]; then continue; fi
+  printf '# %s\n' "$abs"
   printf '```\n'
   cat -- "$f"
   printf '\n```\n\n'
