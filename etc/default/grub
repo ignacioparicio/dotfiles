@@ -1,0 +1,5 @@
+# Partial file
+
+# Fix Ubuntu 24 issues being stuck after resume from sleep
+# https://forums.linuxmint.com/viewtopic.php?t=370225
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash intel_iommu=off"
