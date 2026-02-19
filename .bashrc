@@ -62,3 +62,5 @@ parse_git_branch() {
   fi
 }
 PS1='\[\e[1;34m\]\w\[\e[0m\]$(branch=$(parse_git_branch); [[ -n "$branch" ]] && echo " \[\e[1;33m\][$branch]\[\e[0m\]")\$ '
+
+alias docker-images='docker image list --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.CreatedSince}}\t{{.Size}}"'
