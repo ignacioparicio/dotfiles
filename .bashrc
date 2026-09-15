@@ -1,14 +1,16 @@
-# Auto-start tmux in local terminal, but not in VSCode
-if [ -z "$TMUX" ] && [ "$TERM_PROGRAM" != "vscode" ]; then
-  tmux attach || tmux new
-fi
-
 # NVM (Node Version Manager) setup
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# Auto-start tmux in local terminals, keeping session 0 as the landing session.
+if [ -z "$TMUX" ] && [ "${TERM_PROGRAM:-}" != "vscode" ]; then
+  tmux has-session -t '=0' 2>/dev/null || tmux new-session -d -s 0 2>/dev/null || true
+  "$HOME/.local/bin/scripts/codex_session_restore.py"
+  exec tmux attach-session -t '=0'
+fi
 
 alias vim='nvim'
 alias concat='~/.local/bin/scripts/concat.sh'

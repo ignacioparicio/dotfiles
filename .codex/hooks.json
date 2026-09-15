@@ -1,0 +1,28 @@
+{
+  "description": "Track active Codex sessions for tmux restoration.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^(startup|resume|clear)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.local/bin/scripts/codex_session_hook.py\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.local/bin/scripts/codex_session_hook.py\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}
