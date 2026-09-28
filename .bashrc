@@ -9,6 +9,7 @@ export PATH="$HOME/.local/bin:$PATH"
 if [ -z "$TMUX" ] && [ "${TERM_PROGRAM:-}" != "vscode" ]; then
   tmux has-session -t '=0' 2>/dev/null || tmux new-session -d -s 0 2>/dev/null || true
   "$HOME/.local/bin/scripts/codex_session_restore.py"
+  "$HOME/.local/bin/scripts/claude_session_restore.py"
   exec tmux attach-session -t '=0'
 fi
 
