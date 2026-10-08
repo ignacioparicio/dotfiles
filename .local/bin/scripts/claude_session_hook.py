@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess  # noqa: S404  # Required to call tmux and systemd without a shell.
 import sys
+import time
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
@@ -17,6 +18,9 @@ _TMUX = shutil.which("tmux")
 _SYSTEMCTL = shutil.which("systemctl")
 # Pane title without the status glyph Claude puts before it.
 _WINDOW_NAME_FORMAT = "#{s/^[^a-zA-Z0-9]+ //:pane_title}"
+# How long to look for the transcript /branch creates, and how new it must be.
+_BRANCH_WAIT_SECONDS = 1.0
+_BRANCH_MAX_AGE_SECONDS = 30
 
 
 def main() -> int:
@@ -38,6 +42,9 @@ def main() -> int:
         fcntl.flock(lock, fcntl.LOCK_EX)
         if event["hook_event_name"] == "SessionStart":
             _write_marker(event, directory)
+        elif branch_id := _branched_session_id(event, directory):
+            # /branch ends the old session but sends no SessionStart for the new one.
+            _write_marker({**event, "session_id": branch_id}, directory)
         else:
             _remove_marker(event, directory)
 
@@ -48,6 +55,8 @@ class _HookEvent(TypedDict):
     hook_event_name: str
     session_id: str
     cwd: str
+    reason: str | None
+    transcript_path: str | None
 
 
 def _read_event() -> _HookEvent:
@@ -58,16 +67,66 @@ def _read_event() -> _HookEvent:
     event_name = raw_event.get("hook_event_name")
     session_id = raw_event.get("session_id")
     cwd = raw_event.get("cwd")
+    reason = raw_event.get("reason")
+    transcript_path = raw_event.get("transcript_path")
     if event_name not in {"SessionStart", "SessionEnd"}:
         raise ValueError("unsupported hook event")
     if not isinstance(session_id, str) or not isinstance(cwd, str):
         raise TypeError("session_id and cwd must be strings")
+    if not isinstance(reason, str | None) or not isinstance(
+        transcript_path, str | None
+    ):
+        raise TypeError("reason and transcript_path must be strings or null")
     try:
         uuid.UUID(session_id)
     except ValueError as error:
         raise ValueError("session_id must be a UUID") from error
 
-    return {"hook_event_name": event_name, "session_id": session_id, "cwd": cwd}
+    return {
+        "hook_event_name": event_name,
+        "session_id": session_id,
+        "cwd": cwd,
+        "reason": reason,
+        "transcript_path": transcript_path,
+    }
+
+
+def _branched_session_id(event: _HookEvent, directory: Path) -> str | None:
+    """Return the session that /branch just forked from the ending one, if any."""
+    if event["reason"] != "resume" or not event["transcript_path"]:
+        return None
+
+    transcripts = Path(event["transcript_path"]).parent
+    deadline = time.monotonic() + _BRANCH_WAIT_SECONDS
+    while True:
+        branch_id = _find_new_fork(transcripts, event["session_id"], directory)
+        if branch_id or time.monotonic() >= deadline:
+            return branch_id
+        time.sleep(0.1)
+
+
+def _find_new_fork(transcripts: Path, parent_id: str, directory: Path) -> str | None:
+    cutoff = time.time() - _BRANCH_MAX_AGE_SECONDS
+    newest: tuple[float, str] | None = None
+    for path in transcripts.glob("*.jsonl"):
+        # A fork that already has a marker is an older branch running elsewhere.
+        if (directory / f"{path.stem}.json").exists():
+            continue
+        try:
+            modified = path.stat().st_mtime
+            if modified < cutoff:
+                continue
+            with path.open(encoding="utf-8") as handle:
+                first: object = json.loads(handle.readline())
+            uuid.UUID(path.stem)
+        except (OSError, ValueError):
+            continue
+        fork = first.get("forkedFrom") if isinstance(first, dict) else None
+        if not isinstance(fork, dict) or fork.get("sessionId") != parent_id:
+            continue
+        if newest is None or modified > newest[0]:
+            newest = (modified, path.stem)
+    return newest[1] if newest else None
 
 
 def _write_marker(event: _HookEvent, directory: Path) -> None:
