@@ -15,6 +15,8 @@ from typing import TypedDict
 
 _TMUX = shutil.which("tmux")
 _SYSTEMCTL = shutil.which("systemctl")
+# Pane title without the status glyph Claude puts before it.
+_WINDOW_NAME_FORMAT = "#{s/^[^a-zA-Z0-9]+ //:pane_title}"
 
 
 def main() -> int:
@@ -98,6 +100,10 @@ def _write_marker(event: _HookEvent, directory: Path) -> None:
 
     _run_tmux("set-option", "-w", "-t", pane, "@claude_session_id", event["session_id"])
     _run_tmux("set-option", "-w", "-t", pane, "allow-rename", "on")
+    # Name the window after the terminal title Claude sets, so /rename shows up.
+    _run_tmux(
+        "set-option", "-w", "-t", pane, "automatic-rename-format", _WINDOW_NAME_FORMAT
+    )
 
 
 def _remove_previous_pane_marker(
@@ -137,6 +143,7 @@ def _remove_marker(event: _HookEvent, directory: Path) -> None:
     if tagged_session == event["session_id"]:
         _run_tmux("set-option", "-w", "-u", "-t", pane, "@claude_session_id")
         _run_tmux("set-option", "-w", "-u", "-t", pane, "allow-rename")
+        _run_tmux("set-option", "-w", "-u", "-t", pane, "automatic-rename-format")
 
 
 def _run_tmux(*arguments: str) -> str | None:

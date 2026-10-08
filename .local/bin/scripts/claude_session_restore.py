@@ -210,7 +210,8 @@ def _tag_window(window_id: str, session_id: str) -> None:
         "-t",
         window_id,
         "automatic-rename-format",
-        "#{pane_title}",
+        # Drop the status glyph Claude puts before its terminal title.
+        "#{s/^[^a-zA-Z0-9]+ //:pane_title}",
     )
     _run_tmux("set-option", "-w", "-t", window_id, "automatic-rename", "on")
 
