@@ -100,6 +100,11 @@ def _write_marker(event: _HookEvent, directory: Path) -> None:
 
     _run_tmux("set-option", "-w", "-t", pane, "@codex_session_id", event["session_id"])
     _run_tmux("set-option", "-w", "-t", pane, "allow-rename", "on")
+    # Follow the thread title Codex updates on /rename and /fork.
+    _run_tmux(
+        "set-option", "-w", "-t", pane, "automatic-rename-format", "#{pane_title}"
+    )
+    _run_tmux("set-option", "-w", "-t", pane, "automatic-rename", "on")
 
 
 def _remove_previous_pane_marker(
@@ -138,6 +143,8 @@ def _remove_marker(event: _HookEvent, directory: Path) -> None:
     if tagged_session == event["session_id"]:
         _run_tmux("set-option", "-w", "-u", "-t", pane, "@codex_session_id")
         _run_tmux("set-option", "-w", "-u", "-t", pane, "allow-rename")
+        _run_tmux("set-option", "-w", "-u", "-t", pane, "automatic-rename-format")
+        _run_tmux("set-option", "-w", "-u", "-t", pane, "automatic-rename")
 
 
 def _run_tmux(*arguments: str) -> str | None:

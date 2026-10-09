@@ -5,6 +5,25 @@ export NVM_DIR="$HOME/.nvm"
 
 export PATH="$HOME/.local/bin:$PATH"
 
+# Keep tmux hooks in the launching pane, rather than a shared server's pane.
+# The function keyword avoids expanding an existing codex alias here.
+function codex {
+  local argument
+  if [ -n "${TMUX:-}" ]; then
+    for argument in "$@"; do
+      case "$argument" in
+        --no-daemon|--remote|--remote=*|agents|queue|remote-control)
+          command codex "$@"
+          return
+          ;;
+      esac
+    done
+    command codex --no-daemon "$@"
+  else
+    command codex "$@"
+  fi
+}
+
 # Auto-start tmux in local terminals, keeping session 0 as the landing session.
 if [ -z "$TMUX" ] && [ "${TERM_PROGRAM:-}" != "vscode" ]; then
   tmux has-session -t '=0' 2>/dev/null || tmux new-session -d -s 0 2>/dev/null || true

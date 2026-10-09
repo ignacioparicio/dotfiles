@@ -167,6 +167,7 @@ def _resume_command(record: _SessionRecord, codex: str) -> str:
         _ENV,
         f"CODEX_HOME={record['codex_home']}",
         codex,
+        "--no-daemon",
         "--dangerously-bypass-approvals-and-sandbox",
         "-C",
         record["cwd"],
