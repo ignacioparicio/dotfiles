@@ -131,6 +131,9 @@ def _remove_previous_pane_marker(
 def _remove_marker(event: _HookEvent, directory: Path) -> None:
     if _system_is_stopping() is not False:
         return
+    # Keep markers when the tmux server died, e.g. from an OOM kill, so they come back.
+    if _tmux_server_is_gone():
+        return
 
     (directory / f"{event['session_id']}.json").unlink(missing_ok=True)
 
@@ -145,6 +148,13 @@ def _remove_marker(event: _HookEvent, directory: Path) -> None:
         _run_tmux("set-option", "-w", "-u", "-t", pane, "allow-rename")
         _run_tmux("set-option", "-w", "-u", "-t", pane, "automatic-rename-format")
         _run_tmux("set-option", "-w", "-u", "-t", pane, "automatic-rename")
+
+
+def _tmux_server_is_gone() -> bool:
+    if not os.environ.get("TMUX"):
+        return False
+    # A window closed on a live server still lists sessions; a dead server fails.
+    return _run_tmux("list-sessions", "-F", "#{session_id}") is None
 
 
 def _run_tmux(*arguments: str) -> str | None:
